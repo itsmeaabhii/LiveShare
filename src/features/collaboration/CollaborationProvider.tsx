@@ -115,7 +115,7 @@ export function CollaborationProvider({
     // 6. Track remote awareness states
     const onAwarenessChange = () => {
       const states = new Map<number, AwarenessState>();
-      awareness.getStates().forEach((state, clientId) => {
+      awareness.getStates().forEach((state: Record<string, unknown>, clientId: number) => {
         if (clientId !== ydoc.clientID && state.user) {
           states.set(clientId, state as AwarenessState);
         }

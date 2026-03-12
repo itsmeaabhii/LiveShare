@@ -9,6 +9,10 @@ import { StatusBar } from "@/components/StatusBar";
 import { useFileExplorerStore } from "@/stores";
 import type { VirtualFile } from "@/types";
 
+// Force dynamic rendering because we rely on runtime URL params (room id)
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function EditorWorkspace() {
   const { fileTree } = useCollaboration();
   const activeFileId = useFileExplorerStore((s) => s.activeFileId);

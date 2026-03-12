@@ -17,7 +17,6 @@ import { useAwarenessStore, useConnectionStore } from "@/stores";
 
 // ─── Context Shape ──────────────────────────────────────────────
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 interface CollaborationContextValue {
   /** The shared Yjs document */
   ydoc: Y.Doc;

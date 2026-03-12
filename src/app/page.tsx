@@ -1,5 +1,3 @@
-"use client";
-
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CollaborationProvider, useCollaboration } from "@/features/collaboration";
@@ -11,7 +9,7 @@ import type { VirtualFile } from "@/types";
 
 // Force dynamic rendering because we rely on runtime URL params (room id)
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = false;
 
 function EditorWorkspace() {
   const { fileTree } = useCollaboration();
@@ -54,6 +52,25 @@ function EditorWorkspace() {
 }
 
 export default function WorkspacePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center bg-background text-foreground">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            <span className="text-sm text-muted-foreground">Preparing workspace…</span>
+          </div>
+        </div>
+      }
+    >
+      <ClientWorkspacePage />
+    </Suspense>
+  );
+}
+
+function ClientWorkspacePage() {
+  "use client";
+
   const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:1234";
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -61,7 +78,7 @@ export default function WorkspacePage() {
 
   useEffect(() => {
     const roomFromUrl = searchParams.get("room");
-    
+
     if (roomFromUrl) {
       // Use existing room from URL
       setRoomName(roomFromUrl);
@@ -84,20 +101,9 @@ export default function WorkspacePage() {
   }
 
   return (
-    <Suspense
-      fallback={
-        <div className="flex h-screen items-center justify-center bg-background text-foreground">
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-            <span className="text-sm text-muted-foreground">Preparing workspace…</span>
-          </div>
-        </div>
-      }
-    >
-      <CollaborationProvider roomName={roomName} serverUrl={wsUrl}>
-        <EditorWorkspace />
-      </CollaborationProvider>
-    </Suspense>
+    <CollaborationProvider roomName={roomName} serverUrl={wsUrl}>
+      <EditorWorkspace />
+    </CollaborationProvider>
   );
 }
 

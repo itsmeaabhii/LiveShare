@@ -49,8 +49,10 @@ function EditorWorkspace() {
 }
 
 export default function WorkspacePage() {
+  const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:1234";
+
   return (
-    <CollaborationProvider roomName="nexus-room-1">
+    <CollaborationProvider roomName="nexus-room-1" serverUrl={wsUrl}>
       <EditorWorkspace />
     </CollaborationProvider>
   );

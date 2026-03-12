@@ -117,7 +117,7 @@ export function CollaborationProvider({
       const states = new Map<number, AwarenessState>();
       awareness.getStates().forEach((state: Record<string, unknown>, clientId: number) => {
         if (clientId !== ydoc.clientID && state.user) {
-          states.set(clientId, state as AwarenessState);
+          states.set(clientId, state as unknown as AwarenessState);
         }
       });
       setPeers(states);

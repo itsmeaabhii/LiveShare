@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Wifi, WifiOff, Loader2, Users } from "lucide-react";
+import React, { useState } from "react";
+import { Wifi, WifiOff, Loader2, Users, Share2, Check } from "lucide-react";
 import { useConnectionStore, useAwarenessStore } from "@/stores";
 import { useCollaboration } from "@/features/collaboration";
 import { cn } from "@/lib/utils";
@@ -10,8 +10,19 @@ export function StatusBar() {
   const status = useConnectionStore((s) => s.status);
   const peers = useAwarenessStore((s) => s.peers);
   const { localUser } = useCollaboration();
+  const [copied, setCopied] = useState(false);
 
   const peerCount = peers.size;
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   return (
     <footer className="flex h-6 items-center justify-between border-t border-border bg-background px-3 text-[11px] text-muted-foreground">
@@ -45,6 +56,25 @@ export function StatusBar() {
           </span>
         </div>
       </div>
+
+      {/* Center: Share button */}
+      <button
+        onClick={handleShare}
+        className="flex items-center gap-1.5 rounded px-2 py-0.5 hover:bg-accent transition-colors"
+        title="Copy invite link"
+      >
+        {copied ? (
+          <>
+            <Check size={12} className="text-green-500" />
+            <span className="text-green-500">Link copied!</span>
+          </>
+        ) : (
+          <>
+            <Share2 size={12} />
+            <span>Share room</span>
+          </>
+        )}
+      </button>
 
       {/* Right side: local user identity */}
       <div className="flex items-center gap-1.5">

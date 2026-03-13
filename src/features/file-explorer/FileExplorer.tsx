@@ -89,7 +89,7 @@ export function FileExplorer() {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-sidebar-border px-3 py-2">
         <div className="flex items-center gap-2">
-          <Code2 size={14} className="text-primary" />
+          <Code2 size={14} className="text-red-500" />
           <span className="text-xs font-semibold uppercase tracking-widest text-sidebar-foreground">
             Files
           </span>

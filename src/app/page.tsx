@@ -5,46 +5,6 @@ import ClientWorkspacePage from "./ClientWorkspacePage";
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 
-function EditorWorkspace() {
-  const { fileTree } = useCollaboration();
-  const activeFileId = useFileExplorerStore((s) => s.activeFileId);
-  const [files, setFiles] = useState<VirtualFile[]>([]);
-
-  useEffect(() => {
-    const update = () => setFiles(fileTree.toArray());
-    update();
-    fileTree.observe(update);
-    return () => fileTree.unobserve(update);
-  }, [fileTree]);
-
-  const activeFile = files.find((f) => f.id === activeFileId) ?? null;
-
-  return (
-    <div className="flex h-screen flex-col bg-background text-foreground">
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <FileExplorer />
-
-        {/* Editor pane */}
-        <main className="flex flex-1 flex-col overflow-hidden">
-          {activeFile ? (
-            <CodeEditor key={activeFile.id} file={activeFile} />
-          ) : (
-            <div className="flex flex-1 items-center justify-center">
-              <p className="text-sm text-muted-foreground">
-                Select or create a file to start editing
-              </p>
-            </div>
-          )}
-        </main>
-      </div>
-
-      {/* Status bar */}
-      <StatusBar />
-    </div>
-  );
-}
-
 export default function WorkspacePage() {
   return (
     <Suspense
@@ -60,14 +20,4 @@ export default function WorkspacePage() {
       <ClientWorkspacePage />
     </Suspense>
   );
-}
-
-// Generate a readable room ID (e.g., "cosmic-panda-42")
-function generateRoomId(): string {
-  const adjectives = ["cosmic", "solar", "lunar", "stellar", "quantum", "digital", "neon", "cyber"];
-  const nouns = ["panda", "falcon", "dragon", "phoenix", "tiger", "wolf", "eagle", "leopard"];
-  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-  const num = Math.floor(Math.random() * 100);
-  return `${adj}-${noun}-${num}`;
 }

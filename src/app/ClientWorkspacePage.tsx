@@ -1,10 +1,15 @@
-import React, { Suspense } from "react";
-import ClientWorkspacePage from "./ClientWorkspacePage";
+"use client";
 
-// Force dynamic rendering because we rely on runtime URL params (room id)
-export const dynamic = "force-dynamic";
-export const revalidate = false;
+import React, { useEffect, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { CollaborationProvider, useCollaboration } from "@/features/collaboration";
+import { FileExplorer } from "@/features/file-explorer";
+import { CodeEditor } from "@/features/editor";
+import { StatusBar } from "@/components/StatusBar";
+import { useFileExplorerStore } from "@/stores";
+import type { VirtualFile } from "@/types";
 
+// Internal client-only workspace UI
 function EditorWorkspace() {
   const { fileTree } = useCollaboration();
   const activeFileId = useFileExplorerStore((s) => s.activeFileId);
@@ -45,20 +50,40 @@ function EditorWorkspace() {
   );
 }
 
-export default function WorkspacePage() {
+export default function ClientWorkspacePage() {
+  const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:1234";
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [roomName, setRoomName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const roomFromUrl = searchParams.get("room");
+
+    if (roomFromUrl) {
+      // Use existing room from URL
+      setRoomName(roomFromUrl);
+    } else {
+      // Generate new unique room ID
+      const newRoom = generateRoomId();
+      // Update URL without page reload
+      router.replace(`/?room=${newRoom}`);
+      setRoomName(newRoom);
+    }
+  }, [searchParams, router]);
+
+  // Show loading until room is determined
+  if (!roomName) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
-    <Suspense
-      fallback={
-        <div className="flex h-screen items-center justify-center bg-background text-foreground">
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-            <span className="text-sm text-muted-foreground">Preparing workspace…</span>
-          </div>
-        </div>
-      }
-    >
-      <ClientWorkspacePage />
-    </Suspense>
+    <CollaborationProvider roomName={roomName} serverUrl={wsUrl}>
+      <EditorWorkspace />
+    </CollaborationProvider>
   );
 }
 

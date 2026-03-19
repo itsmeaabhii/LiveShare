@@ -136,8 +136,20 @@ export function CollaborationProvider({
 
     // 8. Helper: create a new file
     const createFileHelper = (name: string): VirtualFile => {
+      // Fallback for insecure contexts (HTTP) where crypto.randomUUID is not available
+      const generateId = () => {
+        if (typeof crypto !== "undefined" && crypto.randomUUID) {
+          return crypto.randomUUID();
+        }
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      };
+
       const file: VirtualFile = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         name,
         language: inferLanguage(name),
         path: `/${name}`,

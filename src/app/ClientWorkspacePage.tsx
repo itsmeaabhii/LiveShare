@@ -51,7 +51,25 @@ function EditorWorkspace() {
 }
 
 export default function ClientWorkspacePage() {
-  const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:1234";
+  // Dynamically determine WebSocket URL to support local network access (e.g., 192.168.x.x)
+  // Priority:
+  // 1. Environment variable (NEXT_PUBLIC_WS_URL)
+  // 2. Current window location hostname (so it works on LAN)
+  // 3. Fallback to localhost
+  const [wsUrl, setWsUrl] = useState(process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:1234");
+
+  useEffect(() => {
+    // If env var is not set, use the current hostname
+    if (!process.env.NEXT_PUBLIC_WS_URL && typeof window !== "undefined") {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const host = window.location.hostname;
+      // Only update if different to avoid re-renders
+      const dynamicUrl = `${protocol}//${host}:1234`;
+      if (dynamicUrl !== wsUrl) {
+        setWsUrl(dynamicUrl);
+      }
+    }
+  }, []);
   const searchParams = useSearchParams();
   const router = useRouter();
   const [roomName, setRoomName] = useState<string | null>(null);

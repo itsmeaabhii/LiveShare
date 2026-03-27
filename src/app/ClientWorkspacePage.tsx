@@ -35,9 +35,12 @@ function EditorWorkspace() {
           {activeFile ? (
             <CodeEditor key={activeFile.id} file={activeFile} />
           ) : (
-            <div className="flex flex-1 items-center justify-center">
+            <div className="flex flex-1 flex-col items-center justify-center gap-4">
+              <h1 className="text-2xl font-semibold text-foreground">
+                👋 Hi, welcome to NexusCode!
+              </h1>
               <p className="text-sm text-muted-foreground">
-                Select or create a file to start editing
+                Create a file in the sidebar to start collaborating.
               </p>
             </div>
           )}
